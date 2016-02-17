@@ -36,6 +36,28 @@ namespace OptionsWebSite.Controllers
             return View(choice);
         }
 
+        public String getYearTerm()
+        {
+            var q = from y in db.YearTerms
+                    where y.IsDefault == true
+                    select y;
+            var yt = q.FirstOrDefault();
+            var ytstring = "";
+            switch(yt.Term)
+            {
+                case 10:
+                    ytstring = "Winter " + yt.Year;
+                    break;
+                case 20:
+                    ytstring = "Spring/Summer " + yt.Year;
+                    break;
+                case 30:
+                    ytstring = "Fall " + yt.Year;
+                    break;
+            }
+            return ytstring;
+        }
+
         // GET: Choices/Create
         public ActionResult Create()
         {
@@ -43,7 +65,7 @@ namespace OptionsWebSite.Controllers
             ViewBag.FourthChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
             ViewBag.SecondChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
             ViewBag.ThirdChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
-            ViewBag.YearTermId = new SelectList(db.YearTerms, "YearTermId", "YearTermId");
+            ViewBag.YearTermId = getYearTerm();
             return View();
         }
 

@@ -19,11 +19,11 @@ namespace DiplomaDataModel
 
         [MaxLength(9)]
         public string StudentId { get; set; }
-        [Required]
-        [MaxLength(40)]
+        [Required(ErrorMessage ="First Name is required.")]
+        [MaxLength(40, ErrorMessage ="First name cannot exceed 40 characters.")]
         public string StudentFirstName { get; set; }
-        [Required]
-        [MaxLength(40)]
+        [Required(ErrorMessage = "Last Name is required.")]
+        [MaxLength(40, ErrorMessage = "Last name cannot exceed 40 characters.")]
         public string StudentLastName { get; set; }
 
         [ForeignKey("FirstOption")]
@@ -55,7 +55,7 @@ namespace DiplomaDataModel
         {
             get
             {
-                return (SelectionDate == DateTime.MinValue) ? DateTime.Now : SelectionDate;
+                return (_SelectionDate == DateTime.MinValue) ? DateTime.Now : _SelectionDate;
             }
             set { _SelectionDate = value; }
         }
