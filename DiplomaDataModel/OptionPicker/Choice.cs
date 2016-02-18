@@ -13,7 +13,7 @@ namespace DiplomaDataModel
         public int ChoiceId { get; set; }
 
         [ForeignKey("YearTerm")]
-        public int YearTermId { get; set; }
+        public int? YearTermId { get; set; }
         [ForeignKey("YearTermId")]
         public YearTerm YearTerm { get; set; }
 

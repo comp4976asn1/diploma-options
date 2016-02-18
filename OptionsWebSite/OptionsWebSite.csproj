@@ -202,9 +202,14 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\OptionPickerMigrations\201602171758370_InitialCreate.cs" />
-    <Compile Include="Migrations\OptionPickerMigrations\201602171758370_InitialCreate.Designer.cs">
-      <DependentUpon>201602171758370_InitialCreate.cs</DependentUpon>
+    <Compile Include="Migrations\IdentityMigrations\201602180601033_InitialCreate.cs" />
+    <Compile Include="Migrations\IdentityMigrations\201602180601033_InitialCreate.Designer.cs">
+      <DependentUpon>201602180601033_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\IdentityMigrations\Configuration.cs" />
+    <Compile Include="Migrations\OptionPickerMigrations\201602180413227_InitialCreate.cs" />
+    <Compile Include="Migrations\OptionPickerMigrations\201602180413227_InitialCreate.Designer.cs">
+      <DependentUpon>201602180413227_InitialCreate.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\OptionPickerMigrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -297,8 +302,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\OptionPickerMigrations\201602171758370_InitialCreate.resx">
-      <DependentUpon>201602171758370_InitialCreate.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\IdentityMigrations\201602180601033_InitialCreate.resx">
+      <DependentUpon>201602180601033_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\OptionPickerMigrations\201602180413227_InitialCreate.resx">
+      <DependentUpon>201602180413227_InitialCreate.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

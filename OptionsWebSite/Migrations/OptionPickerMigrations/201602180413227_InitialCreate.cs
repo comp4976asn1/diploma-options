@@ -12,7 +12,7 @@ namespace OptionsWebSite.Migrations.OptionPickerMigrations
                 c => new
                     {
                         ChoiceId = c.Int(nullable: false, identity: true),
-                        YearTermId = c.Int(nullable: false),
+                        YearTermId = c.Int(),
                         StudentId = c.String(maxLength: 9),
                         StudentFirstName = c.String(nullable: false, maxLength: 40),
                         StudentLastName = c.String(nullable: false, maxLength: 40),
@@ -27,7 +27,7 @@ namespace OptionsWebSite.Migrations.OptionPickerMigrations
                 .ForeignKey("dbo.Options", t => t.FourthChoiceOptionId)
                 .ForeignKey("dbo.Options", t => t.SecondChoiceOptionId)
                 .ForeignKey("dbo.Options", t => t.ThirdChoiceOptionId)
-                .ForeignKey("dbo.YearTerms", t => t.YearTermId, cascadeDelete: true)
+                .ForeignKey("dbo.YearTerms", t => t.YearTermId)
                 .Index(t => t.YearTermId)
                 .Index(t => t.FirstChoiceOptionId)
                 .Index(t => t.SecondChoiceOptionId)
