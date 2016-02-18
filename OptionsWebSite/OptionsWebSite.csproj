@@ -199,19 +199,21 @@
     <Compile Include="Controllers\ChoicesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\OptionsController.cs" />
+    <Compile Include="Controllers\YearTermsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\IdentityMigrations\201602180601033_InitialCreate.cs" />
-    <Compile Include="Migrations\IdentityMigrations\201602180601033_InitialCreate.Designer.cs">
-      <DependentUpon>201602180601033_InitialCreate.cs</DependentUpon>
+    <Compile Include="Migrations\IdentityMigrations\201602180755555_InitialCreate.cs" />
+    <Compile Include="Migrations\IdentityMigrations\201602180755555_InitialCreate.Designer.cs">
+      <DependentUpon>201602180755555_InitialCreate.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\IdentityMigrations\Configuration.cs" />
-    <Compile Include="Migrations\OptionPickerMigrations\201602180413227_InitialCreate.cs" />
-    <Compile Include="Migrations\OptionPickerMigrations\201602180413227_InitialCreate.Designer.cs">
-      <DependentUpon>201602180413227_InitialCreate.cs</DependentUpon>
+    <Compile Include="Migrations\OptionMigrations\Configuration.cs" />
+    <Compile Include="Migrations\OptionPickerMigrations\201602180752172_InitialCreate.cs" />
+    <Compile Include="Migrations\OptionPickerMigrations\201602180752172_InitialCreate.Designer.cs">
+      <DependentUpon>201602180752172_InitialCreate.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\OptionPickerMigrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
@@ -230,7 +232,7 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="ApplicationInsights.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
@@ -283,6 +285,16 @@
     <Content Include="Views\Choices\Details.cshtml" />
     <Content Include="Views\Choices\Edit.cshtml" />
     <Content Include="Views\Choices\Index.cshtml" />
+    <Content Include="Views\YearTerms\Create.cshtml" />
+    <Content Include="Views\YearTerms\Delete.cshtml" />
+    <Content Include="Views\YearTerms\Details.cshtml" />
+    <Content Include="Views\YearTerms\Edit.cshtml" />
+    <Content Include="Views\YearTerms\Index.cshtml" />
+    <Content Include="Views\Options\Create.cshtml" />
+    <Content Include="Views\Options\Delete.cshtml" />
+    <Content Include="Views\Options\Details.cshtml" />
+    <Content Include="Views\Options\Edit.cshtml" />
+    <Content Include="Views\Options\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -302,11 +314,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\IdentityMigrations\201602180601033_InitialCreate.resx">
-      <DependentUpon>201602180601033_InitialCreate.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\IdentityMigrations\201602180755555_InitialCreate.resx">
+      <DependentUpon>201602180755555_InitialCreate.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\OptionPickerMigrations\201602180413227_InitialCreate.resx">
-      <DependentUpon>201602180413227_InitialCreate.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\OptionPickerMigrations\201602180752172_InitialCreate.resx">
+      <DependentUpon>201602180752172_InitialCreate.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

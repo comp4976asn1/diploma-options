@@ -7,6 +7,8 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using DiplomaDataModel;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.AspNet.Identity;
 
 namespace OptionsWebSite.Controllers
 {
@@ -57,16 +59,29 @@ namespace OptionsWebSite.Controllers
             }
             return ytstring;
         }
+        public String getYearTermId()
+        {
+            var q = from y in db.YearTerms
+                    where y.IsDefault == true
+                    select y;
+            var yt = q.FirstOrDefault();
+            return "" + yt.YearTermId;
+        }
 
         // GET: Choices/Create
+        [Authorize]
         public ActionResult Create()
         {
+            // http://stackoverflow.com/questions/20925822/asp-mvc5-identity-how-to-get-current-applicationuser/22746384
+            Models.ApplicationUser user = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId());
+
             ViewBag.FirstChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
             ViewBag.FourthChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
             ViewBag.SecondChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
             ViewBag.ThirdChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
-            ViewBag.YearTermId = new SelectList(getYearTerm(), "YearTermId", "YearTermId");
+            ViewBag.YearTermId = getYearTermId();
             ViewBag.YearTerm = getYearTerm();
+            ViewBag.StudentId = user.UserName;
             return View();
         }
 
