@@ -1,3 +1,4 @@
+
 namespace OptionsWebSite.Migrations.OptionPickerMigrations
 {
     using DiplomaDataModel;
@@ -29,51 +30,56 @@ namespace OptionsWebSite.Migrations.OptionPickerMigrations
 
         }
 
-        private List<Option> getOptions()
+        private List<Option>
+          getOptions()
         {
-            List<Option> options = new List<Option>() {
-                new Option
-                {
-                    Title = "Data Communications",
-                    IsActive = true
-                },
-                new Option
-                {
-                    Title = "Client Server",
-                    IsActive = true
-                },
-                new Option
-                {
-                    Title = "Digital Processing",
-                    IsActive = true
-                },
-                new Option
-                {
-                    Title = "Information Systems",
-                    IsActive = true
-                },
-                new Option
-                {
-                    Title = "Database",
-                    IsActive = false
-                },
-                new Option
-                {
-                    Title = "Web & Mobile",
-                    IsActive = true
-                },
-                new Option
-                {
-                    Title = "Tech Pro",
-                    IsActive = false
-                }
-            };
+            List<Option>
+              options = new List<Option>
+                () {
+        new Option
+        {
+        Title = "Data Communications",
+        IsActive = true
+        },
+        new Option
+        {
+        Title = "Client Server",
+        IsActive = true
+        },
+        new Option
+        {
+        Title = "Digital Processing",
+        IsActive = true
+        },
+        new Option
+        {
+        Title = "Information Systems",
+        IsActive = true
+        },
+        new Option
+        {
+        Title = "Database",
+        IsActive = false
+        },
+        new Option
+        {
+        Title = "Web & Mobile",
+        IsActive = true
+        },
+        new Option
+        {
+        Title = "Tech Pro",
+        IsActive = false
+        }
+                };
             return options;
         }
 
-        private List<YearTerm> getYearTerms()
+        private List<YearTerm>
+          getYearTerms()
         {
-            List<YearTerm> yearTerms = new List<YearTerm>() {
+            List<YearTerm>
+              yearTerms = new List<YearTerm>() {
                 new YearTerm {
                     Year = 2015,
                     Term = 20,
@@ -94,7 +100,7 @@ namespace OptionsWebSite.Migrations.OptionPickerMigrations
                     Term = 30,
                     IsDefault = true
                 },
-            };
+              };
             return yearTerms;
         }
 
