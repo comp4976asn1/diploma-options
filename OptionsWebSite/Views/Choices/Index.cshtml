@@ -1,10 +1,14 @@
 ﻿@model IEnumerable<DiplomaDataModel.Choice>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Choices";
 }
 
 <h2>Index</h2>
+@if ((TempData.ContainsKey("choiceExists")))
+{
+<h3><span class="field-validation-error">@TempData["choiceExists"].ToString()</span></h3>
+}
 
 <p>
     @Html.ActionLink("Create New", "Create")
@@ -12,19 +16,19 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.FirstOption.Title)
+            @Html.DisplayNameFor(model => model.FirstOption)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.FourthOption.Title)
+            @Html.DisplayNameFor(model => model.SecondOption)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.SecondOption.Title)
+            @Html.DisplayNameFor(model => model.ThirdOption)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ThirdOption.Title)
+            @Html.DisplayNameFor(model => model.FourthOption)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.YearTerm.YearTermId)
+            @Html.DisplayNameFor(model => model.YearTerm)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.StudentId)
@@ -44,16 +48,23 @@
             @Html.DisplayFor(modelItem => item.FirstOption.Title)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.FourthOption.Title)
-        </td>
-        <td>
             @Html.DisplayFor(modelItem => item.SecondOption.Title)
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.ThirdOption.Title)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.YearTerm.YearTermId)
+            @Html.DisplayFor(modelItem => item.FourthOption.Title)
+        </td>
+        <td>
+           @*@Html.DisplayFor(modelItem => item.YearTerm.YearTermId)*@
+            @if (item.YearTerm.YearTermId == 10)
+            { <span>Winter </span>}
+            else if(item.YearTerm.YearTermId == 20)
+            { <span>Spring/Summer </span>}
+            else
+            { <span>Fall </span>}
+            @Html.DisplayFor(modelItem => item.YearTerm.Year)
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.StudentId)
@@ -64,11 +75,13 @@
         <td>
             @Html.DisplayFor(modelItem => item.StudentLastName)
         </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.ChoiceId }) |
-            @Html.ActionLink("Details", "Details", new { id=item.ChoiceId }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.ChoiceId })
-        </td>
+        @if (User.IsInRole("Admin"))
+        {
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.ChoiceId }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.ChoiceId })
+            </td>
+        }
     </tr>
 }
 

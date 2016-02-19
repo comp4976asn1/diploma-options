@@ -7,6 +7,8 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using DiplomaDataModel;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.AspNet.Identity;
 
 namespace OptionsWebSite.Controllers
 {
@@ -18,6 +20,7 @@ namespace OptionsWebSite.Controllers
         public ActionResult Index()
         {
             var choices = db.Choices.Include(c => c.FirstOption).Include(c => c.FourthOption).Include(c => c.SecondOption).Include(c => c.ThirdOption).Include(c => c.YearTerm);
+            //ViewBag.Message = TempData["choiceExists"].ToString();
             return View(choices.ToList());
         }
 
@@ -42,32 +45,69 @@ namespace OptionsWebSite.Controllers
                     where y.IsDefault == true
                     select y;
             var yt = q.FirstOrDefault();
-            var ytstring = "";
-            switch(yt.Term)
+            switch (yt.Term)
             {
                 case 10:
-                    ytstring = "Winter " + yt.Year;
-                    break;
+                    return "Winter " + yt.Year;
                 case 20:
-                    ytstring = "Spring/Summer " + yt.Year;
-                    break;
+                    return "Spring/Summer " + yt.Year;
                 case 30:
-                    ytstring = "Fall " + yt.Year;
-                    break;
+                    return "Fall " + yt.Year;
             }
-            return ytstring;
+            return "" + yt.Year;
+        }
+        public String getYearTermId()
+        {
+            var q = from y in db.YearTerms
+                    where y.IsDefault == true
+                    select y;
+            var yt = q.FirstOrDefault();
+            return "" + yt.YearTermId;
+        }
+        public int getTermId()
+        {
+            var q = from y in db.YearTerms
+                    where y.IsDefault == true
+                    select y;
+            var yt = q.FirstOrDefault();
+            return yt.YearTermId;
+        }
+
+        public Boolean exists(String user, int term)
+        {
+            var q = from c in db.Choices
+                    where c.StudentId == user
+                    && c.YearTermId == term
+                    select c;
+            var yt = q.FirstOrDefault();
+            if (yt == null)
+                return true;
+            return false;
         }
 
         // GET: Choices/Create
+        [Authorize]
         public ActionResult Create()
         {
-            ViewBag.FirstChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
-            ViewBag.FourthChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
-            ViewBag.SecondChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
-            ViewBag.ThirdChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
-            ViewBag.YearTermId = new SelectList(getYearTerm(), "YearTermId", "YearTermId");
-            ViewBag.YearTerm = getYearTerm();
-            return View();
+            // http://stackoverflow.com/questions/20925822/asp-mvc5-identity-how-to-get-current-applicationuser/22746384
+            Models.ApplicationUser user = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId());
+
+            if (exists(user.UserName, getTermId()))
+            {
+                ViewBag.FirstChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
+                ViewBag.FourthChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
+                ViewBag.SecondChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
+                ViewBag.ThirdChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
+                ViewBag.YearTermId = getYearTermId();
+                ViewBag.YearTerm = getYearTerm();
+                ViewBag.StudentId = user.UserName;
+                return View();
+            }
+            else
+            {
+                TempData["choiceExists"] = "Options have already been selected for " + user.UserName + " for the current term.";
+                return RedirectToAction("Index");
+            }
         }
 
         // POST: Choices/Create
@@ -94,6 +134,7 @@ namespace OptionsWebSite.Controllers
         }
 
         // GET: Choices/Edit/5
+        [Authorize(Roles ="Admin")]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -111,6 +152,13 @@ namespace OptionsWebSite.Controllers
             ViewBag.ThirdChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.ThirdChoiceOptionId);
             ViewBag.YearTermId = new SelectList(db.YearTerms, "YearTermId", "YearTermId", choice.YearTermId);
             return View(choice);
+            //ViewBag.FirstChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.FirstChoiceOptionId);
+            //ViewBag.FourthChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.FourthChoiceOptionId);
+            //ViewBag.SecondChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.SecondChoiceOptionId);
+            //ViewBag.ThirdChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.ThirdChoiceOptionId);
+            //ViewBag.YearTermId = new SelectList(getYearTerm(), "YearTermId", "YearTermId");
+            //ViewBag.YearTerm = getYearTerm();
+            //return View(choice);
         }
 
         // POST: Choices/Edit/5
@@ -132,6 +180,13 @@ namespace OptionsWebSite.Controllers
             ViewBag.ThirdChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.ThirdChoiceOptionId);
             ViewBag.YearTermId = new SelectList(db.YearTerms, "YearTermId", "YearTermId", choice.YearTermId);
             return View(choice);
+            //ViewBag.FirstChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.FirstChoiceOptionId);
+            //ViewBag.FourthChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.FourthChoiceOptionId);
+            //ViewBag.SecondChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.SecondChoiceOptionId);
+            //ViewBag.ThirdChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.ThirdChoiceOptionId);
+            //ViewBag.YearTermId = new SelectList(getYearTerm(), "YearTermId", "YearTermId");
+            //ViewBag.YearTerm = getYearTerm();
+            //return View(choice);
         }
 
         // GET: Choices/Delete/5
