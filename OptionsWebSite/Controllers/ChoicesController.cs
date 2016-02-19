@@ -15,6 +15,8 @@ namespace OptionsWebSite.Controllers
     public class ChoicesController : Controller
     {
         private OptionPickerContext db = new OptionPickerContext();
+        // http://stackoverflow.com/questions/20925822/asp-mvc5-identity-how-to-get-current-applicationuser/22746384
+        private Models.ApplicationUser user = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId());
 
         // GET: Choices
         public ActionResult Index()
@@ -68,20 +70,32 @@ namespace OptionsWebSite.Controllers
             return "" + yt.YearTermId;
         }
 
+        public List<Option> getActiveOptions()
+        {
+            Option[] options = db.Options.ToArray();
+            List<Option> activeOptions = new List<Option>();
+            for (var i = 0; i < options.Length; i++)
+            {
+                if (options[i].IsActive == true)
+                {
+                    activeOptions.Add(options[i]);
+                }
+            }
+            return activeOptions;
+        }
+
         // GET: Choices/Create
         [Authorize]
         public ActionResult Create()
         {
-            // http://stackoverflow.com/questions/20925822/asp-mvc5-identity-how-to-get-current-applicationuser/22746384
-            Models.ApplicationUser user = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId());
-
-            ViewBag.FirstChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
-            ViewBag.FourthChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
-            ViewBag.SecondChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
-            ViewBag.ThirdChoiceOptionId = new SelectList(db.Options, "OptionId", "Title");
+            List<Option> activeOptions = getActiveOptions();
+            ViewBag.FirstChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title");
+            ViewBag.FourthChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title");
+            ViewBag.SecondChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title");
+            ViewBag.ThirdChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title");
             ViewBag.YearTermId = getYearTermId();
             ViewBag.YearTerm = getYearTerm();
-            ViewBag.StudentId = user.UserName;
+            ViewBag.StudentId = this.user.UserName;
             return View();
         }
 
@@ -110,12 +124,11 @@ namespace OptionsWebSite.Controllers
                 return RedirectToAction("Index");
             }
 
-            Models.ApplicationUser user = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId());
-
-            ViewBag.FirstChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.FirstChoiceOptionId);
-            ViewBag.FourthChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.FourthChoiceOptionId);
-            ViewBag.SecondChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.SecondChoiceOptionId);
-            ViewBag.ThirdChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.ThirdChoiceOptionId);
+            List<Option> activeOptions = getActiveOptions();
+            ViewBag.FirstChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.FirstChoiceOptionId);
+            ViewBag.FourthChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.FourthChoiceOptionId);
+            ViewBag.SecondChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.SecondChoiceOptionId);
+            ViewBag.ThirdChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.ThirdChoiceOptionId);
             ViewBag.YearTermId = choice.YearTermId;
             ViewBag.YearTerm = choice.YearTerm;
             ViewBag.StudentId = choice.StudentId;
@@ -135,15 +148,14 @@ namespace OptionsWebSite.Controllers
                 return HttpNotFound();
             }
 
-            Models.ApplicationUser user = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId());
-
-            ViewBag.FirstChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.FirstChoiceOptionId);
-            ViewBag.FourthChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.FourthChoiceOptionId);
-            ViewBag.SecondChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.SecondChoiceOptionId);
-            ViewBag.ThirdChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.ThirdChoiceOptionId);
+            List<Option> activeOptions = getActiveOptions();
+            ViewBag.FirstChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.FirstChoiceOptionId);
+            ViewBag.FourthChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.FourthChoiceOptionId);
+            ViewBag.SecondChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.SecondChoiceOptionId);
+            ViewBag.ThirdChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.ThirdChoiceOptionId);
             ViewBag.YearTermId = getYearTermId();
             ViewBag.YearTerm = getYearTerm();
-            ViewBag.StudentId = user.UserName;
+            ViewBag.StudentId = this.user.UserName;
             return View(choice);
         }
 
@@ -154,6 +166,16 @@ namespace OptionsWebSite.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "ChoiceId,YearTermId,StudentId,StudentFirstName,StudentLastName,FirstChoiceOptionId,SecondChoiceOptionId,ThirdChoiceOptionId,FourthChoiceOptionId,SelectionDate")] Choice choice)
         {
+            int[] choices = new int[4];
+            choices[0] = (int)choice.FirstChoiceOptionId;
+            choices[1] = (int)choice.SecondChoiceOptionId;
+            choices[2] = (int)choice.ThirdChoiceOptionId;
+            choices[3] = (int)choice.FourthChoiceOptionId;
+            bool isUnique = choices.Distinct().Count() == choices.Count();
+            if (!isUnique)
+            {
+                ModelState.AddModelError(string.Empty, "All option choices need to be unique");
+            }
 
             if (ModelState.IsValid)
             {
@@ -162,12 +184,11 @@ namespace OptionsWebSite.Controllers
                 return RedirectToAction("Index");
             }
 
-            Models.ApplicationUser user = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId());
-
-            ViewBag.FirstChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.FirstChoiceOptionId);
-            ViewBag.FourthChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.FourthChoiceOptionId);
-            ViewBag.SecondChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.SecondChoiceOptionId);
-            ViewBag.ThirdChoiceOptionId = new SelectList(db.Options, "OptionId", "Title", choice.ThirdChoiceOptionId);
+            List<Option> activeOptions = getActiveOptions();
+            ViewBag.FirstChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.FirstChoiceOptionId);
+            ViewBag.FourthChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.FourthChoiceOptionId);
+            ViewBag.SecondChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.SecondChoiceOptionId);
+            ViewBag.ThirdChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.ThirdChoiceOptionId);
             ViewBag.YearTermId = choice.YearTermId;
             ViewBag.YearTerm = choice.YearTerm;
             ViewBag.StudentId = choice.StudentId;
