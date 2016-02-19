@@ -81,10 +81,34 @@ namespace OptionsWebSite.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "YearTermId,Year,Term,IsDefault")] YearTerm yearTerm)
         {
+
+            var q = from y in db.YearTerms
+                    where y.IsDefault == true
+                    select y;
+            var s = q.ToArray();
+            if (yearTerm.IsDefault == false && s.Length <= 1 && yearTerm.YearTermId == s[0].YearTermId)
+            {
+                ModelState.AddModelError("IsDefault", "There must be a default term");
+            }
+            if (yearTerm.IsDefault == true)
+            {
+                for (var i = 0; i < s.Length; i++)
+                {
+                    if (s[i].YearTermId != yearTerm.YearTermId)
+                    {
+                        s[i].IsDefault = false;
+                    }
+                }
+            }
+
             if (ModelState.IsValid)
             {
-                db.Entry(yearTerm).State = EntityState.Modified;
-                db.SaveChanges();
+                try
+                {
+                    db.Entry(yearTerm).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+                catch (Exception) { }
                 return RedirectToAction("Index");
             }
             return View(yearTerm);
