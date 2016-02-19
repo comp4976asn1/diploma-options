@@ -9,7 +9,6 @@ using System.Web.Mvc;
 using DiplomaDataModel;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNet.Identity;
-
 namespace OptionsWebSite.Controllers
 {
     public class ChoicesController : Controller
@@ -22,6 +21,7 @@ namespace OptionsWebSite.Controllers
         public ActionResult Index()
         {
             var choices = db.Choices.Include(c => c.FirstOption).Include(c => c.FourthOption).Include(c => c.SecondOption).Include(c => c.ThirdOption).Include(c => c.YearTerm);
+            //ViewBag.Message = TempData["choiceExists"].ToString();
             return View(choices.ToList());
         }
 
@@ -46,28 +46,37 @@ namespace OptionsWebSite.Controllers
                     where y.IsDefault == true
                     select y;
             var yt = q.FirstOrDefault();
-            var ytstring = "";
-            switch(yt.Term)
+            switch (yt.Term)
             {
                 case 10:
-                    ytstring = "Winter " + yt.Year;
-                    break;
+                    return "Winter " + yt.Year;
                 case 20:
-                    ytstring = "Spring/Summer " + yt.Year;
-                    break;
+                    return "Spring/Summer " + yt.Year;
                 case 30:
-                    ytstring = "Fall " + yt.Year;
-                    break;
+                    return "Fall " + yt.Year;
             }
-            return ytstring;
+            return "" + yt.Year;
         }
-        public String getYearTermId()
+
+        public int getTermId()
         {
             var q = from y in db.YearTerms
                     where y.IsDefault == true
                     select y;
             var yt = q.FirstOrDefault();
-            return "" + yt.YearTermId;
+            return yt.YearTermId;
+        }
+
+        public Boolean exists(String user, int term)
+        {
+            var q = from c in db.Choices
+                    where c.StudentId == user
+                    && c.YearTermId == term
+                    select c;
+            var yt = q.FirstOrDefault();
+            if (yt == null)
+                return true;
+            return false;
         }
 
         public List<Option> getActiveOptions()
@@ -83,22 +92,30 @@ namespace OptionsWebSite.Controllers
             }
             return activeOptions;
         }
-
+   
         // GET: Choices/Create
         [Authorize]
         public ActionResult Create()
         {
-            List<Option> activeOptions = getActiveOptions();
-            ViewBag.FirstChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title");
-            ViewBag.FourthChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title");
-            ViewBag.SecondChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title");
-            ViewBag.ThirdChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title");
-            ViewBag.YearTermId = getYearTermId();
-            ViewBag.YearTerm = getYearTerm();
-            ViewBag.StudentId = this.user.UserName;
-            return View();
+            if (exists(this.user.UserName, getTermId()))
+            {
+                List<Option> activeOptions = getActiveOptions();
+                ViewBag.FirstChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title");
+                ViewBag.FourthChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title");
+                ViewBag.SecondChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title");
+                ViewBag.ThirdChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title");
+                ViewBag.YearTermId = "" + getTermId();
+                ViewBag.YearTerm = getYearTerm();
+                ViewBag.StudentId = this.user.UserName;
+                return View();
+            }
+            else
+            {
+                TempData["choiceExists"] = "Options have already been selected for " + this.user.UserName + " for the current term.";
+                return RedirectToAction("Index");
+            }
         }
-
+   
         // POST: Choices/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -116,14 +133,12 @@ namespace OptionsWebSite.Controllers
             {
                 ModelState.AddModelError(string.Empty, "All option choices need to be unique");
             }
-
             if (ModelState.IsValid)
             {
                 db.Choices.Add(choice);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-
             List<Option> activeOptions = getActiveOptions();
             ViewBag.FirstChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.FirstChoiceOptionId);
             ViewBag.FourthChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.FourthChoiceOptionId);
@@ -134,8 +149,9 @@ namespace OptionsWebSite.Controllers
             ViewBag.StudentId = choice.StudentId;
             return View(choice);
         }
-
+   
         // GET: Choices/Edit/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -147,18 +163,17 @@ namespace OptionsWebSite.Controllers
             {
                 return HttpNotFound();
             }
-
             List<Option> activeOptions = getActiveOptions();
             ViewBag.FirstChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.FirstChoiceOptionId);
             ViewBag.FourthChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.FourthChoiceOptionId);
             ViewBag.SecondChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.SecondChoiceOptionId);
             ViewBag.ThirdChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.ThirdChoiceOptionId);
-            ViewBag.YearTermId = getYearTermId();
+            ViewBag.YearTermId = "" + getTermId();
             ViewBag.YearTerm = getYearTerm();
             ViewBag.StudentId = this.user.UserName;
             return View(choice);
         }
-
+  
         // POST: Choices/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -176,14 +191,12 @@ namespace OptionsWebSite.Controllers
             {
                 ModelState.AddModelError(string.Empty, "All option choices need to be unique");
             }
-
             if (ModelState.IsValid)
             {
                 db.Entry(choice).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-
             List<Option> activeOptions = getActiveOptions();
             ViewBag.FirstChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.FirstChoiceOptionId);
             ViewBag.FourthChoiceOptionId = new SelectList(activeOptions, "OptionId", "Title", choice.FourthChoiceOptionId);
@@ -209,7 +222,7 @@ namespace OptionsWebSite.Controllers
             }
             return View(choice);
         }
-
+   
         // POST: Choices/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -220,7 +233,6 @@ namespace OptionsWebSite.Controllers
             db.SaveChanges();
             return RedirectToAction("Index");
         }
-
         protected override void Dispose(bool disposing)
         {
             if (disposing)
