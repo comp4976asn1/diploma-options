@@ -209,8 +209,14 @@ namespace OptionsWebSite.Controllers
         }
 
         // GET: Choices/Delete/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Delete(int? id)
         {
+
+            var q = from y in db.Choices
+                    select y;
+            var c = q.ToList();
+
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
